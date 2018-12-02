@@ -1,0 +1,83 @@
+from microbit import *
+import random
+
+display.scroll("Welcome to Crashy bird")
+
+
+bbc_screen = 0
+y = 50
+speed = 2
+score = 0
+
+#Pipe brightness
+def make_pipe():
+    i = Image("00005:00005:00005:00005:00005")
+    
+    #Pipe space
+    gap = random.randint(0,3)
+    i.set_pixel(4, gap, 0)
+    i.set_pixel(4, gap+1, 0)
+    return i
+    
+# create pipe
+i = make_pipe()
+
+# Game system 
+Shift_bbc_screen = 20
+New_bbc_screen = 100
+Score_per_bbc_screen = 50
+DELAY = 20 
+
+#game loop
+while True:
+    bbc_screen += 1
+    display.show(i)
+
+
+    
+    # system will flap when button a is pressed
+    if button_a.was_pressed():
+        speed = -7
+        
+    # score will show when button b is pressed
+    if button_b.was_pressed():
+        display.scroll("Score:" + str(score))
+    
+    # Speed of flap
+    speed += 1
+    if speed > 2:
+        speed = 2
+    
+    # flappy bird perameters inside screen
+    y += speed
+    if y > 99:
+        y = 99
+    if y < 0:
+        y = 0
+        
+    # Draw bird
+    led_y = int(y / 20)
+    display.set_pixel(1, led_y, 9)
+    
+    # crashy bird crashes
+    if i.get_pixel(1, led_y) != 0:
+        display.show(Image.SAD)
+        sleep(500)
+        display.scroll("Score: " + str(score))
+        break
+    
+    
+    # move screen left
+    if(bbc_screen % Shift_bbc_screen == 0):
+        i = i.shift_left(1)
+        
+    # create new screen
+    if(bbc_screen % New_bbc_screen == 0):
+        i = make_pipe()
+        
+    # increase score
+    if(bbc_screen % Score_per_bbc_screen == 0):
+        score += 1
+    
+    #restart game
+    sleep(20)
